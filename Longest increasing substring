@@ -1,0 +1,21 @@
+class Solution {
+    public int lengthOfLIS(int[] a) {
+       int b[]=new int[a.length];
+       b[0]=1;
+       for(int i=0;i<a.length;i++)
+       {
+        b[i]=1;
+        for(int j=0;j<i;j++)
+        {
+            if(a[i]>a[j] && b[i]<b[j]+1)
+            b[i]=b[j]+1;
+        }
+       } 
+       int maxl=0;
+       for(int i=0;i<a.length;i++)
+       {
+        maxl=Math.max(maxl,b[i]);
+       }
+       return maxl;
+    }
+}
