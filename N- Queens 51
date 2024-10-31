@@ -1,0 +1,90 @@
+int limit, size, max;
+char*** result;
+
+void update(int **hash, int row, int col){
+  int save_row = row, save_col = col;
+  for(int i = 0; i < limit; i++)
+    hash[row][i] = 1;
+  
+  for(int i = 0; i < limit; i++)
+    hash[i][col] = 1;
+  
+  while(row >= 0 && col < limit)
+    hash[row--][col++] = 1;
+  
+  row = save_row;
+  col = save_col;
+  while(row >= 0 && col >= 0)
+    hash[row--][col--] = 1;
+  
+  row = save_row;
+  col = save_col;
+  while(row < limit && col < limit)
+    hash[row++][col++] = 1;
+  
+  row = save_row;
+  col = save_col;
+  while(row < limit && col >= 0)
+    hash[row++][col--] = 1;  
+}
+
+void queen(int counter, char **table, int **hash, int** returnColumnSizes){
+  if (counter == limit){
+    result[size] = (char**)malloc(sizeof(char*) * limit);
+    (*returnColumnSizes)[size] = limit;
+    for(int i = 0; i < limit; i++){
+      result[size][i] = (char*)malloc(sizeof(char) * limit + 1);
+      table[i][limit] = '\0';
+      strcpy(result[size][i], table[i]);
+    }
+    size++;
+    return;
+  }
+  
+  int **save = (int**)malloc(sizeof(int*) * limit);
+  for(int i = 0; i < limit; i++){
+    save[i] = (int*)malloc(sizeof(int) * limit);
+    for(int j = 0; j < limit; j++){
+      save[i][j] = hash[i][j];
+    }
+  }      
+  
+  for(int col = 0; col < limit; col++){
+    if (hash[counter][col]) continue;
+    table[counter][col] = 'Q';    
+    update(hash, counter, col);
+    
+    queen(counter + 1, table, hash, returnColumnSizes);
+    for(int i = 0; i < limit; i++){
+      for(int j = 0; j < limit; j++)
+        hash[i][j] = save[i][j];
+    }
+    table[counter][col] = '.';
+  }  
+  return;
+}
+
+char *** solveNQueens(int n, int* returnSize, int** returnColumnSizes){
+  limit = n;
+  size = 0;
+  *returnColumnSizes = (int*)malloc(sizeof(int) * 512);
+  result = (char***)malloc(sizeof(char**) * 512);
+  
+  int **hash = (int**)malloc(sizeof(int*) * limit);
+  for(int i = 0; i < n; i++)
+    hash[i] = (int*)calloc(n, sizeof(int));
+  
+  char **table = (char**)malloc(sizeof(char*) * limit);
+  for(int i = 0; i < n; i++)
+    table[i] = (char*)malloc(sizeof(char) * limit + 1);
+  
+  for(int row = 0; row < n; row++){
+    for(int col = 0; col < n; col++){
+      table[row][col] = '.';
+    }
+  }
+  
+  queen(0, table, hash, returnColumnSizes);
+  *returnSize = size;
+  return result;
+}
